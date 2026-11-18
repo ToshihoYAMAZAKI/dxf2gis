@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { open, save } from "@tauri-apps/plugin-dialog";
-// import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import { invoke } from "@tauri-apps/api/core";
 
-export default function App() {
+export function App() {
   const [sourceText, setSourceText] = useState<string>('');
   const [resultText, setResultText] = useState<string>('');
   const [statusMessage, setStatusMessage] = useState<string>('');
@@ -19,16 +18,6 @@ export default function App() {
   const [dstStartY, setDstStartY] = useState<string>('50');
   const [dstEndX, setDstEndX] = useState<string>('150');
   const [dstEndY, setDstEndY] = useState<string>('150');
-
-  // const [dxfContent, setDxfContent] = useState<string>("");
-  // const [resultDxf, setResultDxf] = useState<string>("");
-
-  // アフィン変換パラメータのState
-  // const [scaleX, setScaleX] = useState<number>(1.0);
-  // const [scaleY, setScaleY] = useState<number>(1.0);
-  // const [angleDeg, setAngleDeg] = useState<number>(0.0);
-  // const [tx, setTx] = useState<number>(0.0);
-  // const [ty, setTy] = useState<number>(0.0);
 
   // 1. DXFファイルを開く
   const handleOpenDxf = async () => {
@@ -47,12 +36,6 @@ export default function App() {
       setResultText('');
       setStatusMessage(`読み込み完了: ${selectedPath}`);
 
-      // if (typeof selectedPath === 'string') {
-      //   // const content = await readTextFile(selectedPath);
-      //   const content = await invoke<string>('load_file_content', { path: selectedPath });
-      //   setDxfContent(content);
-      //   setResultDxf('');
-      // }
     } catch (error) {
       console.error('DXF読み込みエラー:', error);
     }
@@ -92,20 +75,6 @@ export default function App() {
       return;
     }
 
-    // if (!dxfContent) return;
-    // try {
-    //   const output = await invoke<string>('transform_dxf_lines', {
-    //     content: dxfContent,
-    //     params: {
-    //       scale_x: Number(scaleX),
-    //       scale_y: Number(scaleY),
-    //       angle_deg: Number(angleDeg),
-    //       tx: Number(tx),
-    //       ty: Number(ty),
-    //     },
-    //   });
-    //   setResultDxf(output);
-
     try {
       const transformed = await invoke<string>('transform_dxf_text', {
         dxfContent: sourceText,
@@ -139,18 +108,6 @@ export default function App() {
         content: resultText,
       });
       setStatusMessage(`${msg}: ${savePath}`);
-
-    // if (!resultDxf) return;
-    // try {
-    //   const savePath = await save({
-    //     defaultPath: 'transformed.dxf',
-    //     filters: [{ name: 'DXF Files', extensions: ['dxf'] }],
-    //   });
-    //   if (savePath) {
-    //     // await writeTextFile(savePath, resultContent);
-    //     await invoke("save_file_content", { path: savePath, content: resultDxf });
-    //     alert('DXFファイルを保存しました');
-    //   }
 
     } catch (error) {
       console.error('保存エラー:', error);
@@ -270,106 +227,6 @@ export default function App() {
       </div>
     </div>
   );
-
-  // return (
-  //   <main className="container">
-  //     <h1>DXF file to GIS Coordinates</h1>
-  //     <div style={{ padding: '20px' }}>
-  //       {/* 操作ボタンエリア */}
-  //       <div style={{ marginBottom: '16px', display: 'flex', gap: '10px' }}>
-  //         <button onClick={handleOpenDxf}>DXFファイルを開く</button>
-  //         <button onClick={handleTransform} disabled={!dxfContent}>
-  //           座標の変換を実行
-  //         </button>
-  //         <button onClick={handleSaveDxf} disabled={!resultDxf}>
-  //           結果を別ファイルに保存
-  //         </button>
-  //       </div>
-
-  //       {/* パラメータ入力エリア */}
-  //       <div
-  //         style={{
-  //           marginBottom: '16px',
-  //           padding: '12px',
-  //           border: '1px solid #ddd',
-  //           borderRadius: '4px',
-  //           backgroundColor: '#fff',
-  //         }}
-  //       >
-  //         <strong>変換パラメータ：</strong>
-  //         <label>
-  //           X倍率:
-  //           <input
-  //             type="number"
-  //             step="0.1"
-  //             value={scaleX}
-  //             onChange={(e) => setScaleX(parseFloat(e.target.value) || 0)}
-  //             style={inputStyle}
-  //           />
-  //         </label>
-  //         <label>
-  //           Y倍率:
-  //           <input
-  //             type="number"
-  //             step="0.1"
-  //             value={scaleY}
-  //             onChange={(e) => setScaleY(parseFloat(e.target.value) || 0)}
-  //             style={inputStyle}
-  //           />
-  //         </label>
-  //         <label>
-  //           回転角(度):
-  //           <input
-  //             type="number"
-  //             step="1"
-  //             value={angleDeg}
-  //             onChange={(e) => setAngleDeg(parseFloat(e.target.value) || 0)}
-  //             style={inputStyle}
-  //           />
-  //         </label>
-  //         <label>
-  //           X移動:
-  //           <input
-  //             type="number"
-  //             step="1"
-  //             value={tx}
-  //             onChange={(e) => setTx(parseFloat(e.target.value) || 0)}
-  //             style={inputStyle}
-  //           />
-  //         </label>
-  //         <label>
-  //           Y移動:
-  //           <input
-  //             type="number"
-  //             step="1"
-  //             value={ty}
-  //             onChange={(e) => setTy(parseFloat(e.target.value) || 0)}
-  //             style={inputStyle}
-  //           />
-  //         </label>
-  //       </div>
-
-  //       {/* 左右2画面の表示エリア */}
-  //       <div style={{ display: 'flex', gap: '20px' }}>
-  //         {/* 左側：読み込んだファイル（読み取り専用） */}
-  //         <div style={{ flex: 1 }}>
-  //           <h3>元のDXFデータ（読み取り専用）</h3>
-  //           <pre style={viewerStyle}>
-  //             {dxfContent || 'DXFファイルを選択してください'}
-  //           </pre>
-  //         </div>
-
-  //         {/* 右側：バックエンドの処理結果（別エリア） */}
-  //         <div style={{ flex: 1 }}>
-  //           <h3>変換後のDXFデータ</h3>
-  //           <pre style={viewerStyle}>
-  //             {resultDxf || 'ここに変換結果が表示されます'}
-  //           </pre>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   </main>
-  // );
 }
 
-// export default App;
+export default App;
